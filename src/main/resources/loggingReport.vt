@@ -1,0 +1,73 @@
+<html>
+<head>
+    <title>Logs</title>
+    <style>
+        .info {
+            color: blue;
+        }
+
+        .error {
+            color: red;
+        }
+
+
+        .logsTable {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid grey;
+            box-shadow: 0px 0px 2px 2px grey;
+        }
+
+        .logsTable td,th {
+            border: 1px solid grey;
+        }
+    </style>
+</head>
+<body>
+<h1>Logs</h1>
+#listLog($logs)
+#tableLog($logs)
+</body>
+</html>
+
+#macro(tableLog $logs)
+<table class="logsTable">
+    <thead>
+        <tr>
+            <th>Level</th>
+            <th>Logger</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    #foreach($log in $logs)
+
+        #set ($levelClass = "#if ($log.level == 'ERROR') error #else info #end")
+
+        <tr class="$levelClass">
+            <td>
+                $log.level
+            </td>
+            <td>
+                $log.loggerName
+            </td>
+            <td>
+                $log.formattedMessage
+            </td>
+        </tr>
+    #end
+    </tbody>
+
+</table>
+#end
+
+#macro(listLog $logs)
+    <ul>
+        #foreach($log in $logs)
+            <li>
+                log: $log.formattedMessage
+            </li>
+        #end
+    </ul>
+#end
