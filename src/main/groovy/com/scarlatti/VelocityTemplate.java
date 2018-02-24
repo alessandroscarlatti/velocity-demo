@@ -8,6 +8,8 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -26,7 +28,7 @@ public class VelocityTemplate {
         VelocityEngine velocity = new VelocityEngine();
         velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-        velocity.setProperty("eventhandler.methodexception.class", ExceptionHandler.class.getName());
+        velocity.setProperty("runtime.references.strict", true);
         velocity.init();
 
         velocity.getProperty("eventhandler.methodexception.class");
@@ -45,7 +47,7 @@ public class VelocityTemplate {
             template.merge(context, writer);
             return writer.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Error filling out template withValue data: " + context, e);
+            throw new RuntimeException(String.format("Error filling out template within context: %n%s", printContext(context)), e);
         }
     }
 
@@ -54,10 +56,13 @@ public class VelocityTemplate {
         return this;
     }
 
-    public static class ExceptionHandler implements MethodExceptionEventHandler {
-        @Override
-        public Object methodException(Class claz, String method, Exception e) throws Exception {
-            throw new RuntimeException(String.format("Error processing method %s on class %s", method, claz), e);
+    private String printContext(VelocityContext context) {
+        StringBuilder sb = new StringBuilder(String.format("VelocityContext%n"));
+        sb.append(String.format("%-60s %s%n", "key", "value"));
+        for (Object key : context.getKeys()) {
+            sb.append(String.format("%-60s %s%n", key, context.get((String)key)));
         }
+
+        return sb.toString();
     }
 }
