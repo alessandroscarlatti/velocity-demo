@@ -1,0 +1,6 @@
+<p>
+This is a particle of the original report that utilizes the context. <br/>
+for example, this reporter:
+
+Name: ${penguin.name} Age: ${penguin.age}
+</p>

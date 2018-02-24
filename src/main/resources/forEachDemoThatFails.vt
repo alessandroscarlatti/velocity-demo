@@ -1,0 +1,13 @@
+<html>
+<head>
+    <title>Report from $continent</title>
+</head>
+<body>
+<h1>Report from $continent</h1>
+<ul>
+    #foreach($penguin in $penguins)
+    <li> $penguin.name is $penguin.ages year(s) old</li>
+    #end
+</ul>
+</body>
+</html>

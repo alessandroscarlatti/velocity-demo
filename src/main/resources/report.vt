@@ -1,0 +1,9 @@
+<html>
+    <head>
+        <title>Report from $continent</title>
+    </head>
+    <body>
+        <h1>Report from $continent</h1>
+        <p>My name is ${penguin.name}.  I am ${penguin.age} years old!  The end.</p>
+    </body>
+</html>
