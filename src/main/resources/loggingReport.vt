@@ -3,13 +3,12 @@
     <title>Logs</title>
     <style>
         .info {
-            color: blue;
+            color: black;
         }
 
         .error {
             color: red;
         }
-
 
         .logsTable {
             width: 100%;
@@ -21,11 +20,14 @@
         .logsTable td,th {
             border: 1px solid grey;
         }
+
+        .logsTable td {
+            vertical-align: text-top;
+        }
     </style>
 </head>
 <body>
 <h1>Logs</h1>
-#listLog($logs)
 #tableLog($logs)
 </body>
 </html>
@@ -54,6 +56,14 @@
             </td>
             <td>
                 $log.formattedMessage
+
+                #if ($!$log.throwableProxy)
+                    <br/> ${log.throwableProxy.className}:
+                    $log.throwableProxy.message
+                    #foreach ($frame in $log.throwableProxy.stackTraceElementProxyArray)
+                        <br/>$frame
+                    #end
+                #end
             </td>
         </tr>
     #end
