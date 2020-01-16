@@ -67,4 +67,23 @@ class VelocityTemplate2Test {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("'report-'yyyy-MM-dd'T'HH.mm.ss'.html'"))),
                 html.getBytes());
     }
+
+    @Test
+    void test3() {
+        def context = [
+                continent: "South America",
+                penguins: [
+                        [name: "Annie2", age: 1],
+                        [name: "Annie3", age: 2],
+                        [name: "Annie4", age: 3],
+                        [name: "Annie5", age: 4],
+                ]
+        ]
+
+        String html = VelocityUtils.renderFromFile("complexReport.vt", context)
+
+        Files.write(Paths.get("reports",
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("'report-'yyyy-MM-dd'T'HH.mm.ss'.html'"))),
+                html.getBytes());
+    }
 }

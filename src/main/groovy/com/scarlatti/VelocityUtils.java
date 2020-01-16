@@ -56,8 +56,10 @@ public class VelocityUtils {
         VelocityEngine velocityEngine = new VelocityEngine();
         tempDir = Files.createTempDirectory("velocity");
         System.out.println("Created temp dir " + tempDir.toAbsolutePath());
+        Path defaultDir = Paths.get("velocity").toAbsolutePath();
+        Files.createDirectories(defaultDir);
         List<File> dirs = new ArrayList<>();
-        dirs.add(Paths.get(".").toFile());
+        dirs.add(defaultDir.toFile());
         dirs.add(tempDir.toFile());
         velocityEngine.setProperty("file.resource.loader.path", String.join(",", dirs.stream().map(File::toString).collect(Collectors.toList())));
         velocityEngine.init();
