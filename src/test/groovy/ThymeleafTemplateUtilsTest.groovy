@@ -1,5 +1,4 @@
-import com.scarlatti.Penguin
-import com.scarlatti.VelocityTemplate2
+import com.scarlatti.ThymeleafUtils
 import com.scarlatti.VelocityUtils
 import org.junit.Test
 
@@ -12,26 +11,7 @@ import java.time.format.DateTimeFormatter
  * @author Alessandro Scarlatti
  * @since Wednesday , 1/15/2020
  */
-class VelocityTemplate2Test {
-
-    @Test
-    void test() {
-
-        VelocityTemplate2 template = VelocityTemplate2.fromFile(Paths.get("src/main/resources/forEachDemo.vt"))
-
-        def context = [
-                continent: "South America",
-                penguins: [
-                        new Penguin("Annie", 1),
-                        new Penguin("Phil", 5),
-                        new Penguin("Charlotte", 8)
-                ]
-        ]
-
-        Files.write(Paths.get("reports",
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("'report-'yyyy-MM-dd'T'HH.mm.ss'.html'"))),
-                template.render(context).getBytes());
-    }
+class ThymeleafTemplateUtilsTest {
 
     @Test
     void test2() {
@@ -48,20 +28,20 @@ class VelocityTemplate2Test {
         String template = '''
 <html>
 <head>
-    <title>Report 2 from $continent</title>
+    <title>Report 2 from <span th:text="${continent}">continent</span></title>
 </head>
 <body>
-<h1>Report from $continent</h1>
+<h1>Report from <span th:text="${continent}">continent</span></h1>
 <ul>
-    #foreach($penguin in $penguins)
-    <li> $penguin.name is $penguin.age year(s) old</li>
-    #end
+    <li th:each="penguin: ${penguins}">
+        <span th:text="${penguin.name}">name</span> is <span th:text="${penguin.age}">age</span> year(s) old
+    </li>
 </ul>
 </body>
 </html>
 '''
 
-        String html = VelocityUtils.renderFromRaw(template, context)
+        String html = ThymeleafUtils.renderFromRaw(template, context)
 
         Files.write(Paths.get("reports",
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("'report-'yyyy-MM-dd'T'HH.mm.ss'.html'"))),
@@ -80,7 +60,7 @@ class VelocityTemplate2Test {
                 ]
         ]
 
-        String html = VelocityUtils.renderFromTemplate("complexReport.vt", context)
+        String html = ThymeleafUtils.renderFromTemplate("complexReport.vt", context)
 
         Files.write(Paths.get("reports",
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("'report-'yyyy-MM-dd'T'HH.mm.ss'.html'"))),

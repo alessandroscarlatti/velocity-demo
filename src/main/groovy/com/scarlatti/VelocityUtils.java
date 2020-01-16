@@ -1,17 +1,22 @@
 package com.scarlatti;
 
+import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.Resource;
+import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,23 +26,29 @@ import java.util.stream.Collectors;
 public class VelocityUtils {
 
     private static VelocityEngine velocityEngine;
-    private static Path tempDir;
 
     public static String renderFromRaw(String template, Map<String, Object> context) {
         try {
             if (velocityEngine == null)
                 velocityEngine = velocityEngine();
 
-            Path tempFile = Files.createTempFile(tempDir, "template", ".vt");
-            Files.write(tempFile, template.getBytes());
-
-            return renderFromFile(tempFile.getFileName().toString(), context);
+            String id = UUID.randomUUID().toString();
+            StringResourceLoader.addRawTemplate(id, template);
+            String rendered = renderFromTemplate(id, context);
+            StringResourceLoader.removeRawTemplate(id);
+            return rendered;
         } catch (Exception e) {
             throw new RuntimeException("Error rendering template", e);
         }
     }
 
-    public static String renderFromFile(String template, Map<String, Object> context) {
+    /**
+     * Render from the named template.
+     * @param template the named template, eg, template1.vt
+     * @param context the context to use
+     * @return the rendered template
+     */
+    public static String renderFromTemplate(String template, Map<String, Object> context) {
         try {
             if (velocityEngine == null)
                 velocityEngine = velocityEngine();
@@ -54,15 +65,50 @@ public class VelocityUtils {
 
     private static VelocityEngine velocityEngine() throws Exception {
         VelocityEngine velocityEngine = new VelocityEngine();
-        tempDir = Files.createTempDirectory("velocity");
-        System.out.println("Created temp dir " + tempDir.toAbsolutePath());
         Path defaultDir = Paths.get("velocity").toAbsolutePath();
         Files.createDirectories(defaultDir);
         List<File> dirs = new ArrayList<>();
         dirs.add(defaultDir.toFile());
-        dirs.add(tempDir.toFile());
+        velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "file,raw");
         velocityEngine.setProperty("file.resource.loader.path", String.join(",", dirs.stream().map(File::toString).collect(Collectors.toList())));
+        velocityEngine.setProperty("raw.resource.loader.class", StringResourceLoader.class.getName());
         velocityEngine.init();
         return velocityEngine;
+    }
+
+    public static class StringResourceLoader extends ResourceLoader {
+
+        private static final Map<String, String> templates = new HashMap<>();
+
+        public static void addRawTemplate(String id, String contents) {
+            templates.put(id, contents);
+        }
+
+        public static void removeRawTemplate(String id) {
+            templates.remove(id);
+        }
+
+        @Override
+        public void init(ExtendedProperties configuration) {
+        }
+
+        @Override
+        public InputStream getResourceStream(String source) throws ResourceNotFoundException {
+            String rawTemplate = templates.get(source);
+            if (rawTemplate == null)
+                return null;
+            else
+                return new ByteArrayInputStream(rawTemplate.getBytes());
+        }
+
+        @Override
+        public boolean isSourceModified(Resource resource) {
+            return false;
+        }
+
+        @Override
+        public long getLastModified(Resource resource) {
+            return 0;
+        }
     }
 }
