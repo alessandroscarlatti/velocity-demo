@@ -24,7 +24,7 @@ public class Demo {
     @Before
     public void setup() {
         try {
-            projectDir = System.getProperty("com.scarlatti.project.dir");
+            projectDir = Paths.get("").toString();
             Files.createDirectories(Paths.get(projectDir, "reports"));
         } catch (Exception e) {
             throw new RuntimeException("Error setting up project directories", e);
