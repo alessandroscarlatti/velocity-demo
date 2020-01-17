@@ -1,5 +1,4 @@
 import com.scarlatti.ThymeleafUtils
-import com.scarlatti.VelocityUtils
 import org.junit.Test
 
 import java.nio.file.Files
@@ -37,11 +36,12 @@ class ThymeleafTemplateUtilsTest {
         <span th:text="${penguin.name}">name</span> is <span th:text="${penguin.age}">age</span> year(s) old
     </li>
 </ul>
+<div th:replace="fragment.html">The particle will go here</div>
 </body>
 </html>
 '''
 
-        String html = ThymeleafUtils.renderFromRaw(template, context)
+        String html = ThymeleafUtils.renderFromRaw(template,  context)
 
         Files.write(Paths.get("reports",
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("'report-'yyyy-MM-dd'T'HH.mm.ss'.html'"))),
@@ -50,7 +50,7 @@ class ThymeleafTemplateUtilsTest {
 
     @Test
     void test3() {
-        def context = [
+        def model = [
                 continent: "South America",
                 penguins: [
                         [name: "Annie2", age: 1],
@@ -60,7 +60,14 @@ class ThymeleafTemplateUtilsTest {
                 ]
         ]
 
-        String html = ThymeleafUtils.renderFromTemplate("complexReport.vt", context)
+        String html = ThymeleafUtils.renderFromTemplate("complexReport.html", Paths.get("thymeleaf2"), model)
+
+        ThymeleafUtils.render {
+            template = "asdf"
+            template = Paths.get("asdf.html")
+            context = model
+            templatesDir = Paths.get("asdf")
+        }
 
         Files.write(Paths.get("reports",
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("'report-'yyyy-MM-dd'T'HH.mm.ss'.html'"))),

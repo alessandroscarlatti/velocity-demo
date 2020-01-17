@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class VelocityUtils {
 
     private static VelocityEngine velocityEngine;
+    public static Path velocityTemplatesDir = Paths.get("velocity");
 
     public static String renderFromRaw(String template, Map<String, Object> context) {
         try {
@@ -65,7 +66,7 @@ public class VelocityUtils {
 
     private static VelocityEngine velocityEngine() throws Exception {
         VelocityEngine velocityEngine = new VelocityEngine();
-        Path defaultDir = Paths.get("velocity").toAbsolutePath();
+        Path defaultDir = velocityTemplatesDir.toAbsolutePath();
         Files.createDirectories(defaultDir);
         List<File> dirs = new ArrayList<>();
         dirs.add(defaultDir.toFile());
